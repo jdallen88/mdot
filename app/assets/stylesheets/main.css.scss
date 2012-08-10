@@ -1,0 +1,54 @@
+$chrome_img_url: 'chromeshell_1280x1024.png';
+$iphone_img_url: 'iphoneshell.jpg';
+
+#content {
+  position:absolute;
+  top:136px;
+}
+.hidden {
+  /*visibility:hidden;*/
+  display:none;
+}
+
+#chrome {
+  float:left;
+  position:relative;
+  /*same w/h as the bg img*/
+  width:1280px;
+  height:1024px;
+  background: image-url($chrome_img_url) no-repeat;
+}
+#chrome .screen {
+  position:absolute;
+  top:77px;
+  left:4px;
+  width:1272px;
+  height:944px;
+  overflow:hidden;
+  border:none;
+}
+
+#iphone {
+  float:left;
+  position:relative;
+  /*same w/h as the bg img*/
+  width:400px;
+  height:750px;
+  background: image-url($iphone_img_url) no-repeat;
+}
+#iphone .screen {
+  position:absolute;
+  top:135px;
+  left:44px;
+  height:480px;
+  width:320px;
+  overflow:hidden;
+  border:none;
+}
+
+iframe.preview {
+  width:100%;
+  height:100%;
+  border:0;
+  overflow:hidden;
+}

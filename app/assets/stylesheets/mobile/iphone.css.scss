@@ -1,0 +1,77 @@
+body {
+    /* rid scrollbar */
+    overflow:hidden; 
+    margin:0;
+    padding:0;
+}
+
+/* css reset for jquery mobile ui */
+.ui-body-c, .ui-overlay-c{
+    text-shadow: 0pt 0px 0pt rgb(0, 0, 0); 
+    background:none;
+}
+
+.logoWrapper {
+    padding: 8px 4px;
+}
+
+/*
+/* originally was using .logo rather than #logo, but it would always get overridden*/
+/* by something mysterious which I couldn't figure out
+ * this repro'ed on hearstnonprofit
+ */
+img#logo {
+    max-width:100%;
+    max-height:120px;
+    min-height:30px;
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
+    background-color:transparent;
+}
+
+.mdContent {
+    margin:0px;
+    padding:0px 15px 10px 15px;
+    background-size:contain;
+}
+
+/* consider using CSS reset or normalize.css */
+.mdContent ul,li,blockquote {
+    margin:0;
+    padding:0;
+    display:inline;
+}
+
+.mdContent ul,li {
+    list-style:none;
+}
+
+.mdContent * {
+    /*this is to avoid text overlapping when overwraps*/
+    /*stick to unit-less as best practice (MDN line-height)*/
+    line-height:1.2 !important;
+    background-size:contain;
+}
+
+.mdContent img, div.bgImg {
+    /*center images:*/
+    /*http://www.w3.org/Style/Examples/007/center.en.html#block*/
+    display:block;
+    margin-left:auto !important;
+    margin-right:auto !important;
+
+    margin-top:5px;
+    margin-bottom:5px;
+    /*keeping aspect ratio*/
+    max-width:280px;
+    height:auto;
+
+    padding:0 !important;
+}
+
+.mdContent img.smallImg {
+    margin-top:5px;
+    margin-bottom:5px;
+    float:left;
+}

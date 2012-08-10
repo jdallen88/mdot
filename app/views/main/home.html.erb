@@ -1,0 +1,46 @@
+<label for='url'>Website URL:</label> 
+<select id='url'>
+  <option value='http://www.tresamigos.com'>tresamigos</option>
+  <option value='http://www.justorthodontics.com'>justorthodontics</option>
+  <option value='http://www.lillypadvillage.com'>lillypadvillage</option>
+  <option value='http://www.nickusborne.com'>nickusborne</option>
+  <option value='http://www.ladeedogs.com'>ladeedogs</option>
+  <option value='http://www.jjsproperty.com'>jjsproperty</option>
+  <option value='http://www.gjawning.com'>gjawning</option>
+  <option value='http://www.uptempomagazine.com'>uptempomagazine</option>
+  <option value='http://www.ecommonwealthbank.com'>ecommonwealthbank</option>
+  <option value='http://wilkinsmiller.com'>wilkinsmiller</option>
+  <option value='http://www.tradingpub.com'>tradingpub</option>
+  <option value='http://www.toptiercomputerservices.com'>toptiercomputerservices</option>
+  <option value='http://www.atisw.com'>atisw</option>
+  <option value='http://www.425motorsports.com'>425motorsports</option>
+  <option value='http://www.cissecurity.ca'>cissecurity</option>
+  <option value='http://www.lamppostpublishing.com'>lamppostpublishing</option>
+  <option value='http://www.hearstnonprofit.com/english/indexen.html'>hearstnonprofit</option>
+  <option value='http://www.aquaplasticsurgery.com'>aquaplasticsurgery</option>
+  <option value='http://www.fosterharris.com'>fosterharris</option>
+  <option value='http://www.littleotterswim.com'>littleotterswim</option>
+</select>
+<button id='action'>Action!</button> 
+<button id='toggleChrome' onclick="mdot.util.toggle($('#chrome'));">Toggle Chrome</button> 
+
+<div id='content'>
+  <div id='iphone'>
+    <div class='screen'>
+
+    </div>
+  </div>
+
+  <div id='chrome'>
+    <div class='screen'>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  $(window).load(function() {
+    mdot.util.toggle($('#chrome'));
+    mdot.init();
+  });
+</script>
