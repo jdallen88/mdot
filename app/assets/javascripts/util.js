@@ -270,135 +270,191 @@ var mdot = (function(parent, $) {
     var logoDColor = my.getDominantColor(logoSrc);
 
     if(my.hasGoodContrast(color, logoDColor))
-      return 'rgb(' + color.red + ',' + color.green + ',' + color.blue + ')';
-          else
-          return 'rgb(240,240,240)';
+      return color;
+    else {
+      if(typeof(color)=='string')
+        color= my.colorStrToObj(color);
+      hex = my.rgbToHex(color.red, color.green, color.blue);
+      return my.getContrast50(hex);
+    }
+  }
+
+  my.colorStrToObj = function(color_str) {
+    nums = color_str.match(/\d+/g);
+    return { 'red':nums[0], 'green':nums[1], 'blue':nums[2] }
+  }
+
+  // http://24ways.org/2010/calculating-color-contrast
+  my.getContrast50 = function(hexcolor) {
+    return (parseInt(hexcolor, 16) > 0xffffff/2) ? 'rgb(0,0,0)':'rgb(255,255,255)'
+  }
+
+  // http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+  my.rgbToHex = function(r,g,b) {
+    return ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+
+  my.getDominantColor = function(img_url) {
+    var colors;
+
+    $.ajax({
+      async:false,
+      data: {
+        get: 'dcolor',
+      url: img_url
+      },
+      dataType: 'json'
+    }).done(function(data) {
+      colors = data
+    });
+
+    return colors
+  }
+
+  //source code @ http://snook.ca/technical/colour_contrast/colour.html
+  my.hasGoodContrast = function(color1, color2) {
+    if(typeof(color1) == 'string')
+      color1 = my.colorStrToObj(color1);
+    if(typeof(color2) == 'string')
+      color2 = my.colorStrToObj(color2);
+
+    var brightnessThreshold = 125;
+    var colorThreshold = 500;
+
+    var bY = ((color1.red * 299) + (color1.green * 587) + (color1.blue * 114)) / 1000;
+    var fY = ((color2.red * 299) + (color2.green * 587) + (color2.blue * 114)) / 1000;
+    var brightnessDifference = Math.abs(bY - fY);
+
+    var colorDifference = (Math.max(color2.red, color1.red) - Math.min(color2.red, color1.red)) + 
+      (Math.max(color2.green, color1.green) - Math.min(color2.green, color1.green)) + 
+      (Math.max(color2.blue, color1.blue) - Math.min(color2.blue, color1.blue));
+
+    var ratio = 1;
+    var l1 = my.getLuminance([color2.red / 255, color2.green / 255, color2.blue / 255]);
+    var l2 = my.getLuminance([color1.red / 255, color1.green / 255, color1.blue / 255]);
+
+    if (l1 >= l2) {
+      ratio = (l1 + .05) / (l2 + .05);
+    } else {
+      ratio = (l2 + .05) / (l1 + .05);
+    }
+    ratio = Math.round(ratio * 100) / 100; // round to 2 decimal places
+
+    return (ratio >= 3) ? true : false;
+
+  }
+
+  // perform math for WCAG2
+  my.getLuminance = function(rgb) {
+
+    for (var i = 0; i < rgb.length; i++) {
+      if (rgb[i] <= 0.03928) {
+        rgb[i] = rgb[i] / 12.92;
+      } else {
+        rgb[i] = Math.pow(((rgb[i] + 0.055) / 1.055), 2.4);
+      }
+    }
+    var l = (0.2126 * rgb[0]) + (0.7152 * rgb[1]) + (0.0722 * rgb[2]);
+    return l;
+  }
+
+  my.getImageSize = function(img_url) {
+    var size;
+
+    $.ajax({
+      async:false,
+      data: {
+        get: 'imgsize',
+      url: img_url
+      },
+      dataType: 'json'
+    }).done(function(data) {
+      size = data
+    });
+
+    return size
+  }
+
+  my.extractUrl = function(input) {
+    // remove quotes and wrapping url()
+    return input.replace(/"/g,"").replace(/url\(|\)$/ig, "");
+  }
+
+  my.findNav = function(dtBody) {
+    var menuItems = [];
+    var $navElem;
+
+    // use $('li').has('ul') to test for sub-level menus
+    $navElem = $(dtBody).find('div>ul>li a').closest('div').filter(function() {
+      var count = $(this).find('*').andSelf().filter('div>ul>li a').length;
+      if(count > 4) return true;
+      else return false;
+    }).first().find('*').andSelf().filter('div>ul>li a');
+
+    if($navElem.length > 0) {
+      $navElem.each(function() {
+        var txt = $(this).text().trim();
+        if(txt != '') {
+          menuItems.push(txt);
+        }
+      });
+    }
+
+    if(menuItems.length > 0) {
+      $navElem.addClass('ignore');
+      return menuItems;
+    }
+
+    var navTables = $(dtBody).find('table>tbody>tr>td a').closest('table');
+    $navElem = navTables.filter(function() {
+      var count = $(this).find('tbody>tr>td a').length;
+      if(count >= 3) return true;
+      else return false;
+    }).first().find('tbody>tr>td a');
+
+    if($navElem.length > 0) {
+      $navElem.each(function() {
+        var $img = $(this).find('img');
+        if($img.length > 0) {
+
+          if($img.attr('alt') && $img.attr('alt')!='') {
+            menuItems.push($img.attr('alt'));
           }
+          else {// grab the href of <a> and camelcase into separate words 
 
-          my.getDominantColor = function(img_url) {
-            var color;
-
-            $.ajax({
-              async:false,
-              data: {
-                get: 'dcolor',
-                url: img_url
-              },
-              dataType: 'json'
-            }).done(function(data) {
-              color = data
-            });
-
-            return color
-          }
-
-          //http://particletree.com/notebook/calculating-color-contrast-for-legible-text/
-          my.hasGoodContrast = function(color1, color2) {
-            var brightness1 = (color1.red*299 + color1.green*587 + color1.blue*114) / 1000;
-            var brightness2 = (color2.red*299 + color2.green*587 + color2.blue*114) / 1000;
-            if(Math.abs(brightness1 - brightness2) > 125)
-              return true;
-            else
-              return false;
-          }
-
-          my.getImageSize = function(img_url) {
-            var size;
-
-            $.ajax({
-              async:false,
-              data: {
-                get: 'imgsize',
-                url: img_url
-              },
-              dataType: 'json'
-            }).done(function(data) {
-              size = data
-            });
-
-            return size
-          }
-
-          my.extractUrl = function(input) {
-            // remove quotes and wrapping url()
-            return input.replace(/"/g,"").replace(/url\(|\)$/ig, "");
-          }
-
-          my.findNav = function(dtBody) {
-            var menuItems = [];
-            var $navElem;
-
-            // use $('li').has('ul') to test for sub-level menus
-            $navElem = $(dtBody).find('div>ul>li a').closest('div').filter(function() {
-              var count = $(this).find('*').andSelf().filter('div>ul>li a').length;
-              if(count > 4) return true;
-              else return false;
-            }).first().find('*').andSelf().filter('div>ul>li a');
-
-            if($navElem.length > 0) {
-              $navElem.each(function() {
-                var txt = $(this).text().trim();
-                if(txt != '') {
-                  menuItems.push(txt);
-                }
-              });
+            var name = $(this).url('true').attr('file');
+            if(name != '') {
+              menuItems.push(name.slice(0, name.indexOf('.'))
+                .replace(/([A-Z])/g, ' $1')
+                .replace(/^./, function(str) { 
+                  return str.toUpperCase(); 
+                }));
             }
-
-            if(menuItems.length > 0) {
-              $navElem.addClass('ignore');
-              return menuItems;
-            }
-
-            var navTables = $(dtBody).find('table>tbody>tr>td a').closest('table');
-            $navElem = navTables.filter(function() {
-              var count = $(this).find('tbody>tr>td a').length;
-              if(count >= 3) return true;
-              else return false;
-            }).first().find('tbody>tr>td a');
-
-            if($navElem.length > 0) {
-              $navElem.each(function() {
-                var $img = $(this).find('img');
-                if($img.length > 0) {
-
-                  if($img.attr('alt') && $img.attr('alt')!='') {
-                    menuItems.push($img.attr('alt'));
-                  }
-                  else {// grab the href of <a> and camelcase into separate words 
-
-                    var name = $(this).url('true').attr('file');
-                    if(name != '') {
-                      menuItems.push(name.slice(0, name.indexOf('.'))
-                        .replace(/([A-Z])/g, ' $1')
-                        .replace(/^./, function(str) { 
-                          return str.toUpperCase(); 
-                        }));
-                    }
-                  }
-                }
-              });
-            }
-
-            if(menuItems.length > 0) {
-              $navElem.addClass('ignore');
-              return menuItems;
-            }
-
-            return menuItems;
-
           }
+        }
+      });
+    }
 
-          // any use for this? This is stripping a particular CSS attribute from the inline style
-          // attribute using regex. With JQ, one can simply set .css(prop,'') to remove it
-          //function stripWidth(style) {
-          //var pat = /[;\s-]?width:\d+px;/i;
-          //var match = pat.exec(style);
-          //if(match!=null) {
-          //var c = match[0][0];
-          //if(c!='w' && c!='-') return style.replace(match[0].substring(1),'');
-          //else if(c=='w') return style.replace(match[0],'');
-          //}
-          //}
+    if(menuItems.length > 0) {
+      $navElem.addClass('ignore');
+      return menuItems;
+    }
 
-          return parent;
+    return menuItems;
+
+  }
+
+  // any use for this? This is stripping a particular CSS attribute from the inline style
+  // attribute using regex. With JQ, one can simply set .css(prop,'') to remove it
+  //function stripWidth(style) {
+  //var pat = /[;\s-]?width:\d+px;/i;
+  //var match = pat.exec(style);
+  //if(match!=null) {
+  //var c = match[0][0];
+  //if(c!='w' && c!='-') return style.replace(match[0].substring(1),'');
+  //else if(c=='w') return style.replace(match[0],'');
+  //}
+  //}
+
+  return parent;
 }(mdot || {}, jQuery));
