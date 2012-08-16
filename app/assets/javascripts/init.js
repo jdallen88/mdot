@@ -39,9 +39,7 @@ function renderMarkup(anchor) {
 
 
     var chromeFrame = document.createElement('iframe');
-    $('#chrome .screen').append(chromeFrame);
-    $(chromeFrame).addClass('preview hidden');
-
+    $('#chrome').append(chromeFrame);
 
     var iphoneFrame = document.createElement('iframe');
     $('#iphone .screen').append(iphoneFrame);
@@ -62,6 +60,11 @@ function renderMarkup(anchor) {
       // with the load event handler after 
       iphoneDoc.write(tmplString);
       iphoneDoc.close();
+
+      // when done remove frame
+      setTimeout(function() {
+        chromeFrame.parentNode.removeChild(chromeFrame);
+      }, 1000);
     });
 
     $(iphoneFrame).load(function($evt) {

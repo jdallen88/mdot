@@ -11,22 +11,19 @@ $iphone_img_url: 'iphoneshell.jpg';
 }
 
 #chrome {
-  float:left;
-  position:relative;
-  /*same w/h as the bg img*/
   width:1280px;
   height:1024px;
-  background: image-url($chrome_img_url) no-repeat;
+  /*background: image-url($chrome_img_url) no-repeat;*/
 }
-#chrome .screen {
-  position:absolute;
-  top:77px;
-  left:4px;
-  width:1272px;
-  height:944px;
-  overflow:hidden;
-  border:none;
-}
+/*#chrome .screen {*/
+  /*position:absolute;*/
+  /*top:77px;*/
+  /*left:4px;*/
+  /*width:1272px;*/
+  /*height:944px;*/
+  /*overflow:hidden;*/
+  /*border:none;*/
+/*}*/
 
 #iphone {
   float:left;
