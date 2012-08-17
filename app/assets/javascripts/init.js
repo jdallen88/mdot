@@ -4,11 +4,14 @@ var mdot = (function(my, $) {
   var tmplString = '<!doctype html><html><head>' + 
   "<meta name='viewport' content='width=320' />" + 
   "<link rel='stylesheet' href='assets/jquery.mobile.css' />" +
+  "<link rel='stylesheet' href='assets/jqm-icon-pack-2.0-original.css' />" +
   "<link rel='stylesheet' href='assets/mobile/iphone.css' />" +
   "<script src='assets/jquery.js'></script>" +
   "<script src='assets/jquery.mobile.js'></script>" +
   '</head><body>' + 
   "<div data-role='content'>" +
+  "<a href='#' data-role='button' data-inline='true' data-icon='phone'>Call Us!</a>" +
+  "<a href='#' data-role='button' data-inline='true' data-icon='mappin'>Find Us!</a>" +
   "<ul id='nav' data-role='listview' data-inset='true'></ul>" +
   '</div>' +
   '</body></html>';
