@@ -52,6 +52,9 @@ GEM
     execjs (1.4.0)
       multi_json (~> 1.0)
     fastimage (1.2.13)
+    font-awesome-sass-rails (2.0.0.0)
+      railties (>= 3.1.1)
+      sass-rails (>= 3.1.1)
     hike (1.2.1)
     i18n (0.6.0)
     journey (1.0.4)
@@ -120,9 +123,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bootstrap-sass (= 2.0.4)
+  bootstrap-sass (= 2.0.4.0)
   coffee-rails (= 3.2.2)
   fastimage (= 1.2.13)
+  font-awesome-sass-rails
   jquery-rails (= 2.0.2)
   jquery_mobile_rails (= 1.1.1)
   miro!

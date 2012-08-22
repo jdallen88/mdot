@@ -128,7 +128,8 @@ var mdot = (function(my, $) {
 
                 // width: no inherit
                 var widthVal = parseInt($(node).css('width'));
-                if(widthVal>280 || nodeName=='input') {
+                // magic number 224: 87.5% of 256, should be 280 for 320px
+                if(widthVal>224 || nodeName=='input') {
                     $(cloned).removeAttr('width','');
                     $(cloned).removeAttr('height','');
                     $(cloned).css('width','');

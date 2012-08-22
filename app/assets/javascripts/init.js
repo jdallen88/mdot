@@ -2,7 +2,7 @@
 var mdot = (function(my, $) {
 
   var tmplString = '<!doctype html><html><head>' + 
-  "<meta name='viewport' content='width=320' />" + 
+  "<meta name='viewport' content='width=320,initial-scale=0.75' />" + 
   "<link rel='stylesheet' href='assets/jquery.mobile.css' />" +
   "<link rel='stylesheet' href='assets/jqm-icon-pack-2.0-original.css' />" +
   "<link rel='stylesheet' href='assets/mobile/iphone.css' />" +
@@ -10,8 +10,8 @@ var mdot = (function(my, $) {
   "<script src='assets/jquery.mobile.js'></script>" +
   '</head><body>' + 
   "<div data-role='content'>" +
-  "<a href='#' data-role='button' data-inline='true' data-icon='phone'>Call Us!</a>" +
-  "<a href='#' data-role='button' data-inline='true' data-icon='mappin'>Find Us!</a>" +
+  "<a href='#' data-role='button' data-inline='false' data-icon='phone'>Call Us!</a>" +
+  "<a href='#' data-role='button' data-inline='false' data-icon='mappin'>Find Us!</a>" +
   "<ul id='nav' data-role='listview' data-inset='true'></ul>" +
   '</div>' +
   '</body></html>';
@@ -113,29 +113,34 @@ function renderMarkup(anchor) {
 my.init = function() {
 
   $('#action').click(function() {
-    var url = $('#url').val(),
-  anchor = document.createElement('a');
+    var url = $('#url').val(), anchor = document.createElement('a');
 
-  anchor.href = url;
+    anchor.href = url;
 
-  // emptying previous contents if any
-  $('.screen').empty();
+    // emptying previous contents if any
+    $('.screen').empty();
 
-  // add loading... animated gif
-  $('.screen').append($('<img class=\'loading\'/>').attr('src','assets/loading.gif').css('margin-top',40));
+    // add loading... animated gif
+    $('.screen').append($('<img class=\'loading\'/>')
+      .attr('src','assets/loading.gif')
+      .css({
+        'position':'relative',
+        'top':'130px',
+        'left':'78px',
+      }));
 
-  // the AJAX call to get markup from arbitrary domains, side-stepping same-orig
-  // restriction by using jsonp:
-  // different domains: the server hosting this JS file vs. the server that retrieves
-  // markup from arbitrary domains
-  $.ajax({
-    data: { 
-      get: 'markup',
+    // the AJAX call to get markup from arbitrary domains, side-stepping same-orig
+    // restriction by using jsonp:
+    // different domains: the server hosting this JS file vs. the server that retrieves
+    // markup from arbitrary domains
+    $.ajax({
+      data: { 
+        get: 'markup',
       url: url 
-    },
-    dataType: 'json',
-    //url: proxyUrl + '?bustCache=' + Math.random(), // cache always fresh for debug
-  }).done(renderMarkup(anchor));// refer to callback comments for why passing anchor
+      },
+      dataType: 'json',
+      //url: proxyUrl + '?bustCache=' + Math.random(), // cache always fresh for debug
+    }).done(renderMarkup(anchor));// refer to callback comments for why passing anchor
 
   });
 }

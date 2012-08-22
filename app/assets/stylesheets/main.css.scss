@@ -1,44 +1,83 @@
-$chrome_img_url: 'chromeshell_1280x1024.png';
-$iphone_img_url: 'iphoneshell.jpg';
+$iphone_img_url: 'iPhone.png';
 
-#content {
-  position:absolute;
-  top:136px;
+body {
+  background: #333;
+  background-image: url("squares.png");
+  background-repeat: repeat;
 }
+.main {
+  margin-top: 40px;
+  margin-bottom: 30px;
+}
+h1 {
+  font-size: 60px;
+  line-height: 76px;
+}
+h2 {
+  color: #FBB450;
+  font-size: 30px;
+  line-height: 36px;
+}
+.right-main p {
+  font-size: 15px;
+  line-height: 22px;
+}
+.xlarge-btn {
+  height: 70px;
+  padding: 20px;
+  width: 308px;
+}
+
+.left-main {
+  float: left;
+  height: auto;
+  margin-right: 30px;
+  width: 400px;
+  padding: 10px;
+}
+/*.left-main img {*/
+  /*float:right;*/
+/*}*/
+.right-main {
+  width: 350px;
+  float:left;
+  padding: 70px 10px 10px;
+}
+.features {
+  padding-bottom:20px;
+}
+.features .offset1, .social .offset1 {
+  margin-left: 125px;
+  margin-top: 40px;
+}
+.features .offset0 {
+  margin-left: 60px;
+  margin-top: 40px;
+}
+
+.features hr, .social hr {
+  margin: 6px 0;
+}
+
 .hidden {
   /*visibility:hidden;*/
   display:none;
 }
 
-#chrome {
-  width:1280px;
-  height:1024px;
-  /*background: image-url($chrome_img_url) no-repeat;*/
-}
-/*#chrome .screen {*/
-  /*position:absolute;*/
-  /*top:77px;*/
-  /*left:4px;*/
-  /*width:1272px;*/
-  /*height:944px;*/
-  /*overflow:hidden;*/
-  /*border:none;*/
-/*}*/
-
 #iphone {
-  float:left;
+  float:right;
   position:relative;
   /*same w/h as the bg img*/
-  width:400px;
-  height:750px;
+  width:322px;
+  height:607px;
   background: image-url($iphone_img_url) no-repeat;
 }
 #iphone .screen {
   position:absolute;
-  top:135px;
-  left:44px;
-  height:480px;
-  width:320px;
+  top:112px;
+  left:33px;
+  height:382px;
+  width:256px;
   overflow:hidden;
   border:none;
 }
