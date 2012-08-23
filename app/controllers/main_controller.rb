@@ -1,6 +1,6 @@
 require 'open-uri'
 require 'json'
-require 'Miro'
+require 'miro'
 require 'fastimage'
 
 class MainController < ApplicationController
