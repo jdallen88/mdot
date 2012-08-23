@@ -30,6 +30,7 @@ gem 'jquery_mobile_rails', '1.1.1'
 gem 'miro', :git => 'git://github.com/rickkoh/miro.git'
 gem 'fastimage', '1.2.13'
 gem 'font-awesome-sass-rails'
+gem 'rmagick', '~> 2.13.1'
 
 #gem 'font-awesome-rails'
 
