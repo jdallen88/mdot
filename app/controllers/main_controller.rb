@@ -21,8 +21,12 @@ class MainController < ApplicationController
 
         when 'dcolor'
 
-          # refer to Miro doc, setting correct path for imagemagick
-          Miro.options[:image_magick_path] = '/usr/local/bin/convert'
+          # setting different path only for development, not Heroku production
+          if Rails.env.development?
+            # refer to Miro doc, setting correct path for imagemagick
+            Miro.options[:image_magick_path] = '/usr/local/bin/convert'
+          end
+
           color_array = Miro::DominantColors.new(url).to_rgba
 
           # by default miro returns 8 dominant colors sorted by percentage
