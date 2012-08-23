@@ -27,8 +27,8 @@ end
 
 gem 'jquery-rails', '2.0.2'
 gem 'jquery_mobile_rails', '1.1.1'
-#gem 'miro', '0.2.1'
-gem 'miro', :git => 'git://github.com/rickkoh/miro.git'
+gem 'miro', '0.2.1'
+#gem 'miro', :git => 'git://github.com/rickkoh/miro.git'
 gem 'fastimage', '1.2.13'
 
 #gem 'font-awesome-rails'
