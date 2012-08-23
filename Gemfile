@@ -22,14 +22,14 @@ group :assets do
   gem 'sass-rails',   '3.2.4'
   gem 'coffee-rails', '3.2.2'
   gem 'uglifier', '1.2.3'
-  gem 'font-awesome-sass-rails'
 end
 
 gem 'jquery-rails', '2.0.2'
 gem 'jquery_mobile_rails', '1.1.1'
-gem 'miro', '0.2.1'
-#gem 'miro', :git => 'git://github.com/rickkoh/miro.git'
+#gem 'miro', '0.2.1'
+gem 'miro', :git => 'git://github.com/rickkoh/miro.git'
 gem 'fastimage', '1.2.13'
+gem 'font-awesome-sass-rails'
 
 #gem 'font-awesome-rails'
 
