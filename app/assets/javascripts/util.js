@@ -125,8 +125,9 @@ var mdot = (function(parent, $) {
 
 
       if(fileName !='' && imgFileNamePat.test(fileName)) {
-        if(fileName.indexOf('google') == -1) //disregarding goog images
-      found = true;//<img> has src whose name contains 'logo', 'index', 'title'
+        //disregarding goog images
+        //<img> has src whose name contains 'logo', 'index', 'title'
+        if(fileName.indexOf('google') == -1) found = true;
       }
 
       else if( ($(this).attr('class') && $(this).attr('class').indexOf('logo')!=-1) || 

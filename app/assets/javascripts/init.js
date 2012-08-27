@@ -42,7 +42,8 @@ function renderMarkup(anchor) {
 
 
     var chromeFrame = document.createElement('iframe');
-    $('#chrome').append(chromeFrame);
+    $(chromeFrame).addClass('preview hidden').attr('id','chrome');;
+    $('#iphone .screen').append(chromeFrame);
 
     var iphoneFrame = document.createElement('iframe');
     $('#iphone .screen').append(iphoneFrame);
@@ -55,9 +56,6 @@ function renderMarkup(anchor) {
     iphoneDoc.open();
 
     $(chromeFrame).load(function() {
-      $('#chrome .loading').remove();
-      $(chromeFrame).removeClass('hidden');
-
       // processing begins after doc loaded, need to have a DOM first
       // has to be in this order: close immediately following write
       // with the load event handler after 
@@ -65,9 +63,9 @@ function renderMarkup(anchor) {
       iphoneDoc.close();
 
       // when done remove frame
-      setTimeout(function() {
-        chromeFrame.parentNode.removeChild(chromeFrame);
-      }, 1000);
+      //setTimeout(function() {
+        //chromeFrame.parentNode.removeChild(chromeFrame);
+      //}, 1000);
     });
 
     $(iphoneFrame).load(function($evt) {
@@ -79,7 +77,6 @@ function renderMarkup(anchor) {
         e.preventDefault();//to stop the entire page being scrolled
         var scrollTop = $(iphoneDoc).scrollTop();
         $(iphoneDoc).scrollTop(scrollTop-e.wheelDeltaY);
-
       }, false);
 
       // setting base href to point to remote to fix urls for resources
@@ -104,16 +101,35 @@ function renderMarkup(anchor) {
 
       $('#iphone .loading').remove();
       $(iphoneFrame).removeClass('hidden');
+
+      $('#action').removeAttr('disabled');
+
+      // zoom the contents of the chrome page to fit the iphone width
+      $(chromeDoc.body).css({
+        'zoom': 256 / chromeDoc.width,
+        'overflow-y':'hidden'
+      });
+
+      chromeDoc.addEventListener('mousewheel',function(e) {
+        e.preventDefault();//to stop the entire page being scrolled
+        var scrollTop = $(chromeDoc).scrollTop();
+        $(chromeDoc).scrollTop(scrollTop-e.wheelDeltaY);
+      }, false);
     });
 
     chromeDoc.write(markup);
     chromeDoc.close();
+
   }}
 
 my.init = function() {
 
   $('#action').click(function() {
-    var url = $('#url').val(), anchor = document.createElement('a');
+    $(this).attr('disabled', 'disabled');
+
+    var anchor = document.createElement('a');
+
+    var url = $('#url_input').val() || $('#url_select').val();
 
     anchor.href = url;
 
@@ -142,6 +158,13 @@ my.init = function() {
       //url: proxyUrl + '?bustCache=' + Math.random(), // cache always fresh for debug
     }).done(renderMarkup(anchor));// refer to callback comments for why passing anchor
 
+  });
+
+  $('#before').click(function() {
+    $('#chrome').removeClass('hidden');
+  });
+  $('#after').click(function() {
+    $('#chrome').addClass('hidden');
   });
 }
 
