@@ -14,6 +14,7 @@ var mdot = (function(my, $) {
         'onmouseout':null,
         'onmouseover':null,
     };
+    var sliderNamePat = /slider|slideshow/i;
 
     function walk(node) {
 
@@ -24,13 +25,12 @@ var mdot = (function(my, $) {
         var cloned;
         var nodeName = node.nodeName.toLowerCase();
 
-        //if( ( node.nodeType == 1 && ($.inArray(nodeName,elemsToIgnore)!=-1) ) ||
-           //( node.nodeType == 1 && mdot.util.isInvisible(node) ) ||
-               //( node.nodeType == 8 ) ||
-                    //$(node).hasClass('ignore') )
-            //return null;
-
+        // should we ignore this node?
         if(mdot.util.isIgnorable(node)) return null;
+
+        // does this DIV house a slider?
+        if(node.className && sliderNamePat.test(node.className))
+          return mdot.util.extractSliderImg(node);
 
         // disregard fixed positioning elements
         if($(node).css('position')=='fixed') {

@@ -29,7 +29,9 @@ var mdot = (function(parent, $) {
       // if only one child node and it's a text node
       if(elem.childNodes.length==1 && elem.firstChild.nodeType==3) {
         // if this child text node contains nothing but space/tab/newline
-        if(!/\S/.test(elem.firstChild.nodeValue)) {
+        // regex \S{5,}: match anything that's NOT a white space char, and the min #
+        // to match is 5 (5 is arbitrary). So that we don't keep things like: |, || etc. 
+        if(!/\S{5,}/.test(elem.firstChild.nodeValue)) {
           return true;
           // and if the element node has no bg img
           //if($(elem).css('background-image')=='none' ||
@@ -51,7 +53,7 @@ var mdot = (function(parent, $) {
             // sudden death: as soon as there's one child that's an element
             return false;
           if(elem.childNodes[idx].nodeType==3 && 
-              /\S/.test(elem.childNodes[idx].nodeValue))
+              /\S{5,}/.test(elem.childNodes[idx].nodeValue))
             return false;
         }
         return true;
@@ -98,7 +100,7 @@ var mdot = (function(parent, $) {
 
   my.isIgnorable = function(elem) {
 
-    var elemsToIgnore = ['iframe','style','noscript','script','embed','object','param'];
+    var elemsToIgnore = ['style','noscript','script','embed','object','param'];
     var name = elem.nodeName.toLowerCase();
     var canIgnore = false;
 
@@ -107,15 +109,22 @@ var mdot = (function(parent, $) {
       if(my.isInvisible(elem)) canIgnore = true;
       if($(elem).hasClass('ignore')) canIgnore = true;
 
+      // ignore header
       if( ($(elem).attr('class') && $(elem).attr('class').indexOf('header')!=-1) || 
           ($(elem).attr('id') && $(elem).attr('id').indexOf('header')!=-1) ) {
             canIgnore = true;
           }
 
+      // ignore footer
       if( ($(elem).attr('class') && $(elem).attr('class').indexOf('footer')!=-1) || 
           ($(elem).attr('id') && $(elem).attr('id').indexOf('footer')!=-1) ) {
             canIgnore = true;
           }
+
+      // to get rid of plugins from addthis.com
+      if($(elem).attr('class') && $(elem).attr('class').indexOf('addthis')!=-1) {
+        canIgnore = true;
+      }
     }
 
     if(elem.nodeType == 8) canIgnore = true;
@@ -470,6 +479,23 @@ var mdot = (function(parent, $) {
 
     return menuItems;
 
+  }
+
+  my.extractSliderImg = function(node) {
+    var imgUrls = [];
+
+    $(node).find('*').each(function() {
+      if($(this).is('img')) imgUrls.push($(this).attr('src'));
+      // possible improvement here (or the only way to get image from havanamania)
+      // is to get the <img> urls from the raw HTTP response before JS is run
+    });
+
+    var $newNode = $('<div>').attr('id','slider_images');
+    $.each(imgUrls, function(idx, url) {
+      $('<img>').attr('src',url).appendTo($newNode);
+    });
+
+    return $newNode[0];
   }
 
   // any use for this? This is stripping a particular CSS attribute from the inline style
