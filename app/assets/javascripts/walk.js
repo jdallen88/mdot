@@ -8,7 +8,6 @@ var mdot = (function(my, $) {
     var SMALL_IMG_WIDTH = 50;
     var SMALL_IMG_HEIGHT = 50;
     var cssToKeep = ['width','font','color','list-style','display','background'];
-    var elemsToIgnore = ['style','noscript','script','embed','object','param'];
     var attribsToIgnore = {
         'align':/left|right/, //removing left/right aligning attributes
         'onload':null, //ridding any onload JSs, e.g. dreamweaver's MM_preloadImages
@@ -25,11 +24,13 @@ var mdot = (function(my, $) {
         var cloned;
         var nodeName = node.nodeName.toLowerCase();
 
-        if( ( node.nodeType == 1 && ($.inArray(nodeName,elemsToIgnore)!=-1) ) ||
-           ( node.nodeType == 1 && mdot.util.isInvisible(node) ) ||
-               ( node.nodeType == 8 ) ||
-                    $(node).hasClass('ignore') )
-            return null;
+        //if( ( node.nodeType == 1 && ($.inArray(nodeName,elemsToIgnore)!=-1) ) ||
+           //( node.nodeType == 1 && mdot.util.isInvisible(node) ) ||
+               //( node.nodeType == 8 ) ||
+                    //$(node).hasClass('ignore') )
+            //return null;
+
+        if(mdot.util.isIgnorable(node)) return null;
 
         // disregard fixed positioning elements
         if($(node).css('position')=='fixed') {
@@ -199,11 +200,14 @@ var mdot = (function(my, $) {
 
         var navMenu = mdot.util.findNav(dtBody);
 
-        var $nav = $mo.find('ul');
+        var $nav = $mo.find('#nav');
 
-        $.each(navMenu, function() {
+        // only displaying the first 3 menu options, however how many actual items
+        // there are - TODO: figure how to do collapsible listview
+        $.each(navMenu.slice(0,3), function() {
             $('<li>').append($('<a>', { href:'#' }).text(this)).appendTo($nav);
         });
+        $('<li>').append($('<a>',{href:'#'}).text('More ...')).appendTo($nav);
 
         // 'listview' exists because we obtain this $ object through the frame's $ reference
         // rather than that of the current doc
