@@ -96,6 +96,33 @@ var mdot = (function(parent, $) {
     return false;
   }
 
+  my.isIgnorable = function(elem) {
+
+    var elemsToIgnore = ['iframe','style','noscript','script','embed','object','param'];
+    var name = elem.nodeName.toLowerCase();
+    var canIgnore = false;
+
+    if(elem.nodeType == 1) {
+      if($.inArray(name, elemsToIgnore)!=-1) canIgnore = true;
+      if(my.isInvisible(elem)) canIgnore = true;
+      if($(elem).hasClass('ignore')) canIgnore = true;
+
+      if( ($(elem).attr('class') && $(elem).attr('class').indexOf('header')!=-1) || 
+          ($(elem).attr('id') && $(elem).attr('id').indexOf('header')!=-1) ) {
+            canIgnore = true;
+          }
+
+      if( ($(elem).attr('class') && $(elem).attr('class').indexOf('footer')!=-1) || 
+          ($(elem).attr('id') && $(elem).attr('id').indexOf('footer')!=-1) ) {
+            canIgnore = true;
+          }
+    }
+
+    if(elem.nodeType == 8) canIgnore = true;
+
+    return canIgnore;
+  }
+
   my.table2div = function(index, table) {
     $(table).replaceWith( $(table).html()
         .replace(/<table/gi, "<div class='table'")

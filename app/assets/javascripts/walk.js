@@ -8,7 +8,6 @@ var mdot = (function(my, $) {
     var SMALL_IMG_WIDTH = 50;
     var SMALL_IMG_HEIGHT = 50;
     var cssToKeep = ['width','font','color','list-style','display','background'];
-    var elemsToIgnore = ['iframe','style','noscript','script','embed','object','param'];
     var attribsToIgnore = {
         'align':/left|right/, //removing left/right aligning attributes
         'onload':null, //ridding any onload JSs, e.g. dreamweaver's MM_preloadImages
@@ -25,11 +24,13 @@ var mdot = (function(my, $) {
         var cloned;
         var nodeName = node.nodeName.toLowerCase();
 
-        if( ( node.nodeType == 1 && ($.inArray(nodeName,elemsToIgnore)!=-1) ) ||
-           ( node.nodeType == 1 && mdot.util.isInvisible(node) ) ||
-               ( node.nodeType == 8 ) ||
-                    $(node).hasClass('ignore') )
-            return null;
+        //if( ( node.nodeType == 1 && ($.inArray(nodeName,elemsToIgnore)!=-1) ) ||
+           //( node.nodeType == 1 && mdot.util.isInvisible(node) ) ||
+               //( node.nodeType == 8 ) ||
+                    //$(node).hasClass('ignore') )
+            //return null;
+
+        if(mdot.util.isIgnorable(node)) return null;
 
         // disregard fixed positioning elements
         if($(node).css('position')=='fixed') {
