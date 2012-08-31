@@ -2,6 +2,7 @@
 var mdot = (function(my, $) {
 
   var tmplString = '<!doctype html><html><head>' + 
+  "<meta charset='utf-8'>" +
   "<meta name='viewport' content='width=320,initial-scale=0.75' />" + 
   "<link rel='stylesheet' href='assets/jquery.mobile.css' />" +
   "<link rel='stylesheet' href='assets/jqm-icon-pack-2.0-original.css' />" +

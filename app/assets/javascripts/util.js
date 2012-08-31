@@ -100,7 +100,7 @@ var mdot = (function(parent, $) {
 
   my.isIgnorable = function(elem) {
 
-    var elemsToIgnore = ['style','noscript','script','embed','object','param'];
+    var elemsToIgnore = ['iframe','style','noscript','script','embed','object','param'];
     var name = elem.nodeName.toLowerCase();
     var canIgnore = false;
 
@@ -110,16 +110,16 @@ var mdot = (function(parent, $) {
       if($(elem).hasClass('ignore')) canIgnore = true;
 
       // ignore header
-      if( ($(elem).attr('class') && $(elem).attr('class').indexOf('header')!=-1) || 
-          ($(elem).attr('id') && $(elem).attr('id').indexOf('header')!=-1) ) {
-            canIgnore = true;
-          }
+      //if( ($(elem).attr('class') && $(elem).attr('class').indexOf('header')!=-1) || 
+          //($(elem).attr('id') && $(elem).attr('id').indexOf('header')!=-1) ) {
+            //canIgnore = true;
+          //}
 
       // ignore footer
-      if( ($(elem).attr('class') && $(elem).attr('class').indexOf('footer')!=-1) || 
-          ($(elem).attr('id') && $(elem).attr('id').indexOf('footer')!=-1) ) {
-            canIgnore = true;
-          }
+      //if( ($(elem).attr('class') && $(elem).attr('class').indexOf('footer')!=-1) || 
+          //($(elem).attr('id') && $(elem).attr('id').indexOf('footer')!=-1) ) {
+            //canIgnore = true;
+          //}
 
       // to get rid of plugins from addthis.com
       if($(elem).attr('class') && $(elem).attr('class').indexOf('addthis')!=-1) {
@@ -132,71 +132,85 @@ var mdot = (function(parent, $) {
     return canIgnore;
   }
 
+  // the trick here is to single-column'ize <table> but keeping the attributes that
+  // comes with the table
+  //http://stackoverflow.com/questions/3665820/change-the-tag-but-keep-the-attributes-and-content-jquery-javascript
   my.table2div = function(index, table) {
-    $(table).replaceWith( $(table).html()
-        .replace(/<table/gi, "<div class='table'")
+    var p = $(table).wrapAll("<div class='replace'></div>");
+    var a = p.map(function() {
+      return this.innerHTML;
+    }).get().join(' ');
+
+    p.html(a.replace(/<table/gi, "<div class='table'")
         .replace(/<tbody/gi, "<div class='tbody'")
         .replace(/<tr/gi, "<div class='tr'")
         .replace(/<\/tr>/gi, "</div>")
         .replace(/<td/gi, "<div class='td'")
         .replace(/<\/td>/gi, "</div>")
         .replace(/<\/tbody/gi, "<\/div")
-        .replace(/<\/table/gi, "<\/div")
-        );
+        .replace(/<\/table/gi, "<\/div"));
   }
 
   my.findLogo = function(dtBody) {
 
     var logos = [];
-    var imgFileNamePat = /header|index|logo|title/i;
-    var hpNamePat = /index|header|home/i;
+    var logoNamePat = /header|index|logo|title|titre/i;
+    var imgIgnorePat = /goog|facebook/i;
+    var hpNamePat = /\/|index|header|home/i;
 
     // <img> logo
+    var imgLogos = [];
 
     $(dtBody).find('img:visible').each(function() {
 
       var found = false;
       var fileName = $(this).url().attr('file');
+      var altText = $(this).attr('alt');
       var bgImgUrl = $(this).css('background-image');
+      var score = 0;
 
 
-      if(fileName !='' && imgFileNamePat.test(fileName)) {
-        //disregarding goog images
+      if(fileName !='' && logoNamePat.test(fileName)) {
+        //disregarding goog/fb images
         //<img> has src whose name contains 'logo', 'index', 'title'
-        if(fileName.indexOf('google') == -1) found = true;
+        if(!imgIgnorePat.test(fileName) && !imgIgnorePat.test(altText)) { 
+          score++;
+        }
+      }
+      //<img> whose id/class is 'logo'
+      if(logoNamePat.test(this.className) || logoNamePat.test(this.id)) {
+        score++;
+      }
+      //<img> has BG img whose name contains 'logo','index','title'
+      if(bgImgUrl!='' && bgImgUrl!='none') {
+        if(logoNamePat.test($.url(bgImgUrl).attr('file')))
+          score++;
       }
 
-      else if( ($(this).attr('class') && $(this).attr('class').indexOf('logo')!=-1) || 
-        ($(this).attr('id') && $(this).attr('id').indexOf('logo')!=-1 ) )
-        found = true;//<img> whose id/class is 'logo'
+      var ancestors = $(this).parentsUntil('body').filter(function() {
+        // if there's an ancestor <a> that points to homepage
+        if(this.nodeName.toLowerCase()=='a' &&
+          (this.href==this.baseURI ||
+           hpNamePat.test($(this).url().attr('host'))))
+          return true;
 
-      else if(bgImgUrl!='' && bgImgUrl!='none') {
-        if(imgFileNamePat.test($.url(bgImgUrl).attr('file')))
-      found = true; //<img> has BG img whose name contains 'logo','index','title'
-      }
+        // or a div with id/class name matching pattern
+        if( this.nodeName.toLowerCase() == 'div' &&
+          (logoNamePat.test(this.className) || logoNamePat.test(this.id)) )
+          return true;
+      });
 
-      else {
-        var ancestors = $(this).parentsUntil('body').filter(function() {
-          if(this.nodeName.toLowerCase()=='a' &&
-            ($(this).url().attr('host')==window.location.hostname ||
-             hpNamePat.test($(this).url().attr('host'))))
-            found = true; // ancestor is <a> pointing at homepage
-          if( this.nodeName.toLowerCase()=='div' &&
-            ( ($(this).attr('id') && $(this).attr('id').indexOf('logo')!=-1) ||
-              ($(this).attr('class') && $(this).attr('class').indexOf('logo')!=-1) ) )
-            found = true; // ancestor is a <div> with class/id containing 'logo'
-        });
+      if(ancestors.length>0) score++;
 
-        if(ancestors.length != 0)
-          found = true;
-      }
-
-      if(found) {
-        logos.push(this);
-        return false;
+      if(score > 0) {
+        imgLogos.push([this, score]);
       }
 
     });
+
+    imgLogos.sort(function(a,b) { return b[1] - a[1]; });
+
+    if(imgLogos.length > 0) logos.push(imgLogos[0][0]);
 
     // <div> logo
 
@@ -207,7 +221,7 @@ var mdot = (function(parent, $) {
       var bgImgUrl = my.extractUrl($(this).css('background-image'));
 
       if(bgImgUrl!='' && bgImgUrl!='none' && bgImgUrl.indexOf('webkit')==-1) {
-        if(imgFileNamePat.test($.url(bgImgUrl).attr('file')))
+        if(logoNamePat.test($.url(bgImgUrl).attr('file')))
       found = true; //<div> has BG img whose name matches 
     //else if($(this).attr('id').indexOf('header')!=-1 ||
     //$(this).attr('class').indexOf('header')!=-1)
@@ -230,7 +244,7 @@ var mdot = (function(parent, $) {
 
       var bgImgUrl = my.extractUrl($(this).css('background-image'));
       if(bgImgUrl!='' && bgImgUrl!='none') {
-        if(imgFileNamePat.test($.url(bgImgUrl).attr('file')))
+        if(logoNamePat.test($.url(bgImgUrl).attr('file')))
       found = true; //<a> has BG img whose name matches 
         else if($(this).url().attr('host')==window.location.hostname ||
           hpNamePat.test($(this).url().attr('host')))
@@ -249,32 +263,42 @@ var mdot = (function(parent, $) {
 
     // the triage algorithm:
     // 1. if one has 'logo' in its name and the others don't, then bingo
-    // 2. if more than 1 image has 'logo' then whoever appears first in DOM order wins
+    // 2. if more than 1 image has 'logo' then whoever appears first in the array
+    // //2. if more than 1 image has 'logo' then whoever appears first in DOM order wins
     // 3. if none of the images have 'logo' in name, then return the first one in orig array
 
     var logoInName = [];
-    for(var i=0; i<logos.length; i++) {
-      var node = logos[i].nodeName.toLowerCase();
-      var fileName;
-      if(node == 'img')
-        fileName = $.url(logos[i].src).attr('file');
-      else 
-        fileName = $.url(my.extractUrl($(logos[i]).css('background-image'))).attr('file');
 
-      if(fileName.toLowerCase().indexOf('logo')!=-1)
-        logoInName.push(logos[i]);
+    if(logos.length > 0) {
+      for(var i=0; i<logos.length; i++) {
+        var node = logos[i].nodeName.toLowerCase();
+        var fileName;
+        if(node == 'img')
+          fileName = $.url(logos[i].src).attr('file');
+        else 
+          fileName = $.url(my.extractUrl($(logos[i]).css('background-image'))).attr('file');
+
+        if(fileName.toLowerCase().indexOf('logo')!=-1)
+          logoInName.push(logos[i]);
+      }
+
+      if(logoInName.length==0)
+        return logos[0];
+      else
+        return logoInName[0];
     }
+    else 
+      return null;
 
-    if(logoInName.length == 0) return logos[0];
-    if(logoInName.length == 1) return logoInName[0];
+    //if(logoInName.length == 1) return logoInName[0];
 
     // sort by document order
-    var sortedLogos = logoInName.sort(function(a,b) {
-      return 3 - (a.compareDocumentPosition(b) & 6);
-    });
-    return sortedLogos[0];
+    //var sortedLogos = logoInName.sort(function(a,b) {
+      //return 3 - (a.compareDocumentPosition(b) & 6);
+    //});
+    //return sortedLogos[0];
 
-    return null;
+    //return null;
 
   }
 
@@ -434,6 +458,26 @@ var mdot = (function(parent, $) {
         if(txt != '') {
           menuItems.push(txt);
         }
+        else {
+          var $img = $(this).find('img');
+          if($img.length > 0) {
+
+            if($img.attr('alt') && $img.attr('alt')!='') {
+              menuItems.push($img.attr('alt'));
+            }
+            else {// grab the href of <a> and camelcase into separate words 
+
+              var name = $(this).url('true').attr('file');
+              if(name != '') {
+                menuItems.push(name.slice(0, name.indexOf('.'))
+                  .replace(/([A-Z])/g, ' $1')
+                  .replace(/^./, function(str) { 
+                    return str.toUpperCase(); 
+                  }));
+              }
+            }
+          }
+        }
       });
     }
 
@@ -451,21 +495,28 @@ var mdot = (function(parent, $) {
 
     if($navElem.length > 0) {
       $navElem.each(function() {
-        var $img = $(this).find('img');
-        if($img.length > 0) {
 
-          if($img.attr('alt') && $img.attr('alt')!='') {
-            menuItems.push($img.attr('alt'));
-          }
-          else {// grab the href of <a> and camelcase into separate words 
+        var txt = $(this).text().trim();
+        if(txt != '') {
+          menuItems.push(txt);
+        }
+        else {
+          var $img = $(this).find('img');
+          if($img.length > 0) {
 
-            var name = $(this).url('true').attr('file');
-            if(name != '') {
-              menuItems.push(name.slice(0, name.indexOf('.'))
-                .replace(/([A-Z])/g, ' $1')
-                .replace(/^./, function(str) { 
-                  return str.toUpperCase(); 
-                }));
+            if($img.attr('alt') && $img.attr('alt')!='') {
+              menuItems.push($img.attr('alt'));
+            }
+            else {// grab the href of <a> and camelcase into separate words 
+
+              var name = $(this).url('true').attr('file');
+              if(name != '') {
+                menuItems.push(name.slice(0, name.indexOf('.'))
+                  .replace(/([A-Z])/g, ' $1')
+                  .replace(/^./, function(str) { 
+                    return str.toUpperCase(); 
+                  }));
+              }
             }
           }
         }
@@ -483,9 +534,13 @@ var mdot = (function(parent, $) {
 
   my.extractSliderImg = function(node) {
     var imgUrls = [];
+    var controlButtonsPat = /prev|next|pause|play|left|right/i;
 
     $(node).find('*').each(function() {
-      if($(this).is('img')) imgUrls.push($(this).attr('src'));
+      if($(this).is('img')) {
+        var url = $(this).url();
+        if(!controlButtonsPat.test(url.attr('file'))) imgUrls.push($(this).attr('src'));
+      }
       // possible improvement here (or the only way to get image from havanamania)
       // is to get the <img> urls from the raw HTTP response before JS is run
     });

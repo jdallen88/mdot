@@ -14,7 +14,7 @@ var mdot = (function(my, $) {
         'onmouseout':null,
         'onmouseover':null,
     };
-    var sliderNamePat = /slider|slideshow/i;
+    var sliderNamePat = /slider|slideshow|rotator/i;
 
     function walk(node) {
 
@@ -29,7 +29,7 @@ var mdot = (function(my, $) {
         if(mdot.util.isIgnorable(node)) return null;
 
         // does this DIV house a slider?
-        if(node.className && sliderNamePat.test(node.className))
+        if(sliderNamePat.test(node.className) || sliderNamePat.test(node.id))
           return mdot.util.extractSliderImg(node);
 
         // disregard fixed positioning elements
@@ -38,10 +38,10 @@ var mdot = (function(my, $) {
         }
 
         // only allow FB iframe
-        if(nodeName=='iframe') {
-            if($(node).attr('src').indexOf('facebook.com')==-1)
-                return null;
-        }
+        //if(nodeName=='iframe') {
+            //if($(node).attr('src').indexOf('facebook.com')==-1)
+                //return null;
+        //}
 
         if(nodeName == 'body')
             cloned = $('<div />', { class:'body' }).get(0);
@@ -60,11 +60,12 @@ var mdot = (function(my, $) {
             });
 
             // if <img>, then either center it or keep orig props
-            if( nodeName == 'img') {
+            if( (nodeName=='img') 
+                || (nodeName=='input'&& $(node).attr('type')=='image') ) {
 
                 // if image w h ratio is out of wack, don't use it
-                if( (node.width / node.height > 50) ||
-                   (node.height / node.width > 50) )
+                if( (node.width / node.height > 20) ||
+                   (node.height / node.width > 20) )
                     return null;
 
                 if(node.width < SMALL_IMG_WIDTH && node.height < SMALL_IMG_HEIGHT) {
@@ -98,26 +99,30 @@ var mdot = (function(my, $) {
                     $(cloned).css('font', fontVal);
                 }
 
-                // Disregard all bg images
-                //var bgImageVal = $(node).css('background-image');
-                //if( (bgImageVal!='none' && bgImageVal!='') || bgColorVal!='rgba(0, 0, 0, 0)') {
-                    //if(bgImageVal!='none' && bgImageVal!='') {
-                        //// if image w h ratio is out of wack, don't use it
-                        //var imagUrl = mdot.util.extractUrl(bgImageVal);
-                        //var size = mdot.util.getImageSize(imageUrl);
-                        //if( !size ||
-                           //(size.width / size.height > 50) ||
-                               //(size.height / size.width > 50) )
-                            //$(cloned).css('background-image', 'none');
-                    //}
+                // bg images
+                if(nodeName == 'body') {
+                  var bgImageVal = $(node).css('background-image');
+                  if( (bgImageVal!='none' && bgImageVal!='') || bgColorVal!='rgba(0, 0, 0, 0)') {
+                    if(bgImageVal!='none' && bgImageVal!='') {
+                      // if image w h ratio is out of wack, don't use it
+                      var imageUrl = mdot.util.extractUrl(bgImageVal);
+                      var size = mdot.util.getImageSize(imageUrl);
+                      if( !size ||
+                          (size.width / size.height > 50) ||
+                          (size.height / size.width > 50) )
+                        $(cloned).css('background-image', 'none');
+                    }
 
-                    //$(cloned).css('background', $(node).css('background'));
-                //}
+                    $(cloned).css('background-image', $(node).css('background-image'));
+                    $(cloned).css('background-repeat', $(node).css('background-repeat'));
+                  }
+                }
 
                 // background-color: no inherit
                 var bgColorVal = $(node).css('background-color');
-                if( (bgColorVal != 'rgba(0, 0, 0, 0)') &&
-                    (nodeName != 'body') ) {
+                if( (bgColorVal != 'rgba(0, 0, 0, 0)') 
+                    //&& (nodeName != 'body') 
+                    ) {
                     $(cloned).css('background-color', $(node).css('background-color'));
                 }
 
@@ -133,8 +138,8 @@ var mdot = (function(my, $) {
                 if(widthVal>224 || nodeName=='input') {
                     $(cloned).removeAttr('width','');
                     $(cloned).removeAttr('height','');
-                    $(cloned).css('width','');
-                    $(cloned).css('height','');
+                    $(cloned).css('width','224px');
+                    $(cloned).css('height','auto');
                 } else {
                     $(cloned).css('width', widthVal);
                 }
@@ -228,4 +233,3 @@ var mdot = (function(my, $) {
 
     return my;
 }(mdot || {}, jQuery));
-

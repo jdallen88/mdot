@@ -14,10 +14,11 @@ class MainController < ApplicationController
         case intent
 
         when 'markup'
-          # dictated by charset meta tag on the HTML page, different encoding schemes
-          # are used for the returned string. In order for JSON to serialize it we
-          # need to convert it to UTF-8
-          render :json => JSON.dump(open(url).read.encode('utf-8', 'iso-8859-1'))
+          markup_string = open(url).read
+          if markup_string.encoding.name != 'UTF-8'
+            markup_string.force_encoding('utf-8')
+          end
+          render :json => JSON.dump(markup_string)
 
         when 'dcolor'
 
