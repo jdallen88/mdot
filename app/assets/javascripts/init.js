@@ -1,3 +1,13 @@
+//an example of creating a submodule in the modular pattern introduced in 
+//http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth
+
+// following the JS modular pattern here, whereby everything is enclosed inside one
+// namespace, named 'mdot' here. Think of this 'mdot' as a huge class in Object Oriented
+// speak, and each single JS file is one partial class of that huge class
+
+// init.js:
+// as the name suggests, this is the initial entry point of the conversion algorithm
+// follow code from the init function
 
 var mdot = (function(my, $) {
 
@@ -17,11 +27,12 @@ var mdot = (function(my, $) {
   '</div>' +
   '</body></html>';
 
-// CB to be executed when AJAX returns markup from server
-// this markup is what's to be mobilized
-// the weird returning annon func is a way to get the anchor var passed in as parameter
+
+// This is a callback to be executed when AJAX returns markup from server, which is
+// what's to be mobilized.
+// This weird returning annon function is a way to get the anchor var passed in as parameter
 // from the closure that initiated the AJAX
-// ref: http://stackoverflow.com/questions/939032/jquery-pass-more-parameters-into-callback
+// details here: http://stackoverflow.com/questions/939032/jquery-pass-more-parameters-into-callback
 function renderMarkup(anchor) {
   return function(markup) {
 
@@ -32,7 +43,7 @@ function renderMarkup(anchor) {
     var pat = /<head(.*?)>/gi,
         match = pat.exec(markup);
 
-    // goal: adding the <base> immediately after <head>
+    // adding the <base> immediately after <head>
     markup = markup.replace(pat, '<head ' +
         match[1] +
         '><base href=\'' +
@@ -63,7 +74,9 @@ function renderMarkup(anchor) {
       iphoneDoc.write(tmplString);
       iphoneDoc.close();
 
-      // when done remove frame
+      // when done remove frame. Currently commented out because I'm showing off 
+      // before and after comparison. If no need for comparison then we can uncomment this
+      // and remove the frame when done
       //setTimeout(function() {
         //chromeFrame.parentNode.removeChild(chromeFrame);
       //}, 1000);
@@ -98,6 +111,7 @@ function renderMarkup(anchor) {
       iphoneWin.jQuery('img').error(function(){
         this.style.display = 'none';
       });
+
       iphoneWin.jQuery('img').each(function() { this.src = this.src; });
 
       $('#iphone .loading').remove();
@@ -123,6 +137,8 @@ function renderMarkup(anchor) {
 
   }}
 
+
+// this is supposed to be the place where initialization stuff happens 
 my.init = function() {
 
   $('#action').click(function() {
@@ -156,7 +172,6 @@ my.init = function() {
       url: url 
       },
       dataType: 'json',
-      //url: proxyUrl + '?bustCache=' + Math.random(), // cache always fresh for debug
     }).done(renderMarkup(anchor));// refer to callback comments for why passing anchor
 
   });

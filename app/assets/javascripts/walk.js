@@ -1,3 +1,14 @@
+//an example of creating a submodule in the modular pattern introduced in 
+//http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth
+
+// following the JS modular pattern here, whereby everything is enclosed inside one
+// namespace, named 'mdot' here. Think of this 'mdot' as a huge class in Object Oriented
+// speak, and each single JS file is one partial class of that huge class
+
+// walk.js
+// this contains the main algorithm for converting desktop site. It is better to keep it
+// as short as possible by delegating most of the more granular sub-tasks into utility
+// functions in util.js
 
 var mdot = (function(my, $) {
     

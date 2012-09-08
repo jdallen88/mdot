@@ -3,6 +3,12 @@ require 'json'
 require 'miro'
 require 'fastimage'
 
+# this is the main controller, which provides the following services to the front-end,
+# namely:
+# - grabbing markup from a different domain
+# - calculate dominant color of an image
+# - calculate image size
+#
 class MainController < ApplicationController
   def home
     respond_to do |format|

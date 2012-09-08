@@ -1,17 +1,16 @@
 //an example of creating a submodule in the modular pattern introduced in 
 //http://www.adequatelygood.com/2010/3/JavaScript-Module-Pattern-In-Depth
 
+// following the JS modular pattern here, whereby everything is enclosed inside one
+// namespace, named 'mdot' here. Think of this 'mdot' as a huge class in Object Oriented
+// speak, and each single JS file is one partial class of that huge class
+
+// util.js
+// this JS file includes all the utility functions required by the main conversion
+// algorithm
+
 var mdot = (function(parent, $) {
   var my = parent.util = parent.util || {};
-
-  // JQ's toggle uses 'display-none' which puts markup off layout tree and as a result
-  // cannot get realistic w/h info
-  my.toggle = function($elem) {
-    if($elem.css('visibility')=='hidden')
-  $elem.css('visibility','visible');
-    else if($elem.css('visibility')=='visible')
-  $elem.css('visibility','hidden');
-  }
 
   // empty means no child tag elem, no child text elem, or whose text elem only
   // contains white space character
@@ -183,24 +182,29 @@ var mdot = (function(parent, $) {
       }
       //<img> has BG img whose name contains 'logo','index','title'
       if(bgImgUrl!='' && bgImgUrl!='none') {
-        if(logoNamePat.test($.url(bgImgUrl).attr('file')))
-          score++;
+        try {
+          if(logoNamePat.test($.url(bgImgUrl).attr('file')))
+            score++;
+        } catch(e) { }
       }
 
-      var ancestors = $(this).parentsUntil('body').filter(function() {
+      $(this).parentsUntil('body').each(function() {
         // if there's an ancestor <a> that points to homepage
-        if(this.nodeName.toLowerCase()=='a' &&
-          (this.href==this.baseURI ||
-           hpNamePat.test($(this).url().attr('host'))))
-          return true;
+        try {
+          if(this.nodeName.toLowerCase()=='a' &&
+            (this.href==this.baseURI || hpNamePat.test($(this).url().attr('host')))) {
+              score+=2;
+              return false;
+            }
+        } catch(e) { }
 
         // or a div with id/class name matching pattern
         if( this.nodeName.toLowerCase() == 'div' &&
-          (logoNamePat.test(this.className) || logoNamePat.test(this.id)) )
-          return true;
+          (logoNamePat.test(this.className) || logoNamePat.test(this.id)) ) {
+            score++;
+            return false;
+          }
       });
-
-      if(ancestors.length>0) score++;
 
       if(score > 0) {
         imgLogos.push([this, score]);
@@ -221,11 +225,11 @@ var mdot = (function(parent, $) {
       var bgImgUrl = my.extractUrl($(this).css('background-image'));
 
       if(bgImgUrl!='' && bgImgUrl!='none' && bgImgUrl.indexOf('webkit')==-1) {
-        if(logoNamePat.test($.url(bgImgUrl).attr('file')))
-      found = true; //<div> has BG img whose name matches 
-    //else if($(this).attr('id').indexOf('header')!=-1 ||
-    //$(this).attr('class').indexOf('header')!=-1)
-    //found = true; // <div> that has BG img and has id/class containing 'header'
+        try {
+          if(logoNamePat.test($.url(bgImgUrl).attr('file'))) {
+            found = true; //<div> has BG img whose name matches 
+          }
+        } catch(e) { }
       }
 
       if(found) {
@@ -243,13 +247,18 @@ var mdot = (function(parent, $) {
       var found = false;
 
       var bgImgUrl = my.extractUrl($(this).css('background-image'));
-      if(bgImgUrl!='' && bgImgUrl!='none') {
-        if(logoNamePat.test($.url(bgImgUrl).attr('file')))
-      found = true; //<a> has BG img whose name matches 
-        else if($(this).url().attr('host')==window.location.hostname ||
-          hpNamePat.test($(this).url().attr('host')))
-          found = true;
-      }
+
+      try {
+        if(bgImgUrl!='' && bgImgUrl!='none') {
+          if(logoNamePat.test($.url(bgImgUrl).attr('file'))) {
+            found = true; //<a> has BG img whose name matches 
+          }
+          else if($(this).url().attr('host')==window.location.hostname ||
+            hpNamePat.test($(this).url().attr('host'))) {
+              found = true;
+            }
+        }
+      } catch(e) { }
 
       if(found) {
         logos.push(this);
@@ -552,18 +561,6 @@ var mdot = (function(parent, $) {
 
     return $newNode[0];
   }
-
-  // any use for this? This is stripping a particular CSS attribute from the inline style
-  // attribute using regex. With JQ, one can simply set .css(prop,'') to remove it
-  //function stripWidth(style) {
-  //var pat = /[;\s-]?width:\d+px;/i;
-  //var match = pat.exec(style);
-  //if(match!=null) {
-  //var c = match[0][0];
-  //if(c!='w' && c!='-') return style.replace(match[0].substring(1),'');
-  //else if(c=='w') return style.replace(match[0],'');
-  //}
-  //}
 
   return parent;
 }(mdot || {}, jQuery));
