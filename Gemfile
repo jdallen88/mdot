@@ -1,23 +1,20 @@
 # Gotta version the gems:
 # http://blog.agoragames.com/blog/2010/11/30/to-version-or-not-to-version-your-gems-in-gemfiles/
+# ruby gem versioning operators: ~>, => etc. 
+# http://docs.rubygems.org/read/chapter/16#page76
 
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.7'
+gem 'rails', '3.2.8'
 gem 'bootstrap-sass', '2.0.4.0'
-#gem 'bcrypt-ruby', '3.0.1'
-#gem 'faker', '1.0.1'
+gem 'bcrypt-ruby', '~> 3.0.1'
 #gem 'will_paginate', '3.0.3'
 #gem 'bootstrap-will_paginate', '0.0.6'
 
 group :development, :test do
   gem 'sqlite3', '1.3.5'
-  #gem 'rspec-rails', '2.10.0'
-  #gem 'annotate', '~> 2.4.1.beta'
 end
 
-# Gems used only for assets and not required
-# in production environments by default.
 group :assets do
   gem 'sass-rails',   '3.2.4'
   gem 'coffee-rails', '3.2.2'
@@ -32,12 +29,14 @@ gem 'fastimage', '1.2.13'
 gem 'font-awesome-sass-rails'
 gem 'rmagick', '~> 2.13.1'
 
-#gem 'font-awesome-rails'
+gem "devise", "~> 2.1.2"
+gem "cancan", "~> 1.6.8"
+gem "rolify", "~> 3.2.0"
 
-#group :test do
-  #gem 'capybara', '1.1.2'
-  #gem 'factory_girl_rails', '1.4.0'
-#end
+gem "hominid", "~> 3.0.5"
+gem "google_visualr", "~> 2.1.3"
+gem "jquery-datatables-rails", "~> 1.11.0"
+gem "simple_form", "~> 2.0.2"
 
 group :production do
   gem 'pg', '0.12.2'

@@ -65,4 +65,15 @@ class MainController < ApplicationController
       end
     end
   end
+
+  def help
+  end
+
+  def savePage
+    #logger.debug "=== savePage: #{params[:iphoneHtml]}"
+    reset_session
+    session[:iphoneHtml] = params[:iphoneHtml]
+    redirect_to signup_url
+  end
+
 end

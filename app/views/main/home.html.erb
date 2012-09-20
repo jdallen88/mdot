@@ -71,9 +71,15 @@
         <option value='http://www.ecommonwealthbank.com'>ecommonwealthbank</option>
       </select>
 
-      <button id='action' class="btn btn-large btn-block btn-warning">Mobilify!</button>
-      <button id='before' class="btn btn-large btn-block btn-warning">Before</button>
-      <button id='after' class="btn btn-large btn-block btn-warning">After</button>
+      <button id='action' class="btn btn-large btn-block btn-primary">Mobilify!</button>
+      <button id='before' class="btn btn-large btn-block btn-primary">Before</button>
+      <button id='after' class="btn btn-large btn-block btn-primary">After</button>
+
+      <%= form_tag '/savePage', :id => 'savePageForm' do %>
+        <%= hidden_field_tag 'iphoneHtml' %>
+        <%= submit_tag 'Save and continue', :class => 'btn btn-large btn-block btn-primary' %>
+      <% end %>
+
     </div>
 
   </div>

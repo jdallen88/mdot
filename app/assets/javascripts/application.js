@@ -13,4 +13,5 @@
 //= require jquery
 //= require jquery_ujs
 //= require jquery.url
+//= require bootstrap
 //= require_directory .

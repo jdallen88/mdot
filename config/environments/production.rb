@@ -30,7 +30,12 @@ MdotApp::Application.configure do
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
+  # Storing authentication cookies on a user’s browser and transmitting them over the network 
+  # exposes an application to a session hijacking attack, which involves copying the remember 
+  # token and using it to sign in as the corresponding user. This attack was publicized by the 
+  # Firesheep application, which showed that many high-profile sites (including Facebook and Twitter) 
+  # were vulnerable. The solution is to use site-wide SSL.
+  config.force_ssl = true
 
   # See everything in the log (default is :info)
   # config.log_level = :debug
@@ -66,4 +71,14 @@ MdotApp::Application.configure do
   # Log the query plan for queries taking more than this (works
   # with SQLite, MySQL, and PostgreSQL)
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
+
+  config.action_mailer.default_url_options = { :host => 'example.com' }
+  # ActionMailer Config
+  # Setup for production - deliveries, no errors raised
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.raise_delivery_errors = false
+  config.action_mailer.default :charset => "utf-8"
+
+
 end
