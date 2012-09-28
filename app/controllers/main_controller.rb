@@ -10,6 +10,7 @@ require 'fastimage'
 # - calculate image size
 #
 class MainController < ApplicationController
+
   def home
     respond_to do |format|
       format.html
@@ -31,7 +32,7 @@ class MainController < ApplicationController
           # setting different path only for development, not Heroku production
           if Rails.env.development?
             # refer to Miro doc, setting correct path for imagemagick
-            if File.exists?('/user/local/bin/convert')
+            if File.exists?('/usr/local/bin/convert')
               Miro.options[:image_magick_path] = '/usr/local/bin/convert'
             else
               Miro.options[:image_magick_path] = "c:/ImageMagick/convert"
@@ -75,5 +76,9 @@ class MainController < ApplicationController
     session[:iphoneHtml] = params[:iphoneHtml]
     redirect_to signup_url
   end
+
+  #def test
+    #render :layout => false
+  #end
 
 end
