@@ -27,7 +27,7 @@ var mdot = (function(my, $) {
   '</div>' +
   '</body></html>';
 
-  var chromeDoc, iphoneDoc;
+  var desktopDoc, mobileDoc;
 
   // This is a callback to be executed when AJAX returns markup from server, which is
   // what's to be mobilized.
@@ -54,94 +54,159 @@ var mdot = (function(my, $) {
           anchor.pathname + '\'  />');
   
   
-      var chromeFrame = document.createElement('iframe');
-      $(chromeFrame).addClass('preview hidden').attr('id','chrome');;
-      $('#iphone .screen').append(chromeFrame);
+      var desktopFrame = document.createElement('iframe');
+      $(desktopFrame).addClass('preview hidden');
+      $('.desktop .screen').append(desktopFrame);
   
-      var iphoneFrame = document.createElement('iframe');
-      $('#iphone .screen').append(iphoneFrame);
-      $(iphoneFrame).addClass('preview hidden');
+      var mobileFrame = document.createElement('iframe');
+      $('.mobile .screen').append(mobileFrame);
+      $(mobileFrame).addClass('preview hidden');
   
-      chromeDoc = chromeFrame.contentWindow.document;
-      iphoneDoc = iphoneFrame.contentWindow.document;
+      desktopDoc = desktopFrame.contentWindow.document;
+      mobileDoc = mobileFrame.contentWindow.document;
   
-      chromeDoc.open();
-      iphoneDoc.open();
+      desktopDoc.open();
+      mobileDoc.open();
   
-      $(chromeFrame).load(function() {
+      $(desktopFrame).load(function() {
         // processing begins after doc loaded, need to have a DOM first
         // has to be in this order: close immediately following write
         // with the load event handler after 
-        iphoneDoc.write(tmplString);
-        iphoneDoc.close();
+        mobileDoc.write(tmplString);
+        mobileDoc.close();
+        $(desktopFrame).removeClass('hidden');
+        $('.desktop .loading').remove();
   
         // when done remove frame. Currently commented out because I'm showing off 
         // before and after comparison. If no need for comparison then we can uncomment this
         // and remove the frame when done
         //setTimeout(function() {
-          //chromeFrame.parentNode.removeChild(chromeFrame);
+          //desktopFrame.parentNode.removeChild(desktopFrame);
         //}, 1000);
       });
   
-      $(iphoneFrame).load(function($evt) {
-        //$evt to get ahold of iphoneFrame and its jQuery reference
-        var iphoneWin = $evt.target.contentWindow;
+      $(mobileFrame).load(function($evt) {
+        //$evt to get ahold of mobileFrame and its jQuery reference
+        var mobileWin = $evt.target.contentWindow;
   
         // since there's no scrollbars, gotta use mousewheel to scroll
-        iphoneDoc.addEventListener('mousewheel',function(e) {
+        mobileDoc.addEventListener('mousewheel',function(e) {
           e.preventDefault();//to stop the entire page being scrolled
-          var scrollTop = $(iphoneDoc).scrollTop();
-          $(iphoneDoc).scrollTop(scrollTop-e.wheelDeltaY);
+          var scrollTop = $(mobileDoc).scrollTop();
+          $(mobileDoc).scrollTop(scrollTop-e.wheelDeltaY);
         }, false);
   
         // setting base href to point to remote to fix urls for resources
-        $(iphoneDoc).find('head').prepend("<base href='" +
+        $(mobileDoc).find('head').prepend("<base href='" +
           anchor.protocol +
           '//' +
           anchor.hostname +
           anchor.pathname + "' />");
   
-        $(chromeDoc).find('head title').appendTo($(iphoneDoc).find('head'));
+        $(desktopDoc).find('head title').appendTo($(mobileDoc).find('head'));
   
         // calling into main meat of the app - transforming desktop markup into mobile
         // using the iframe's $ object so that we can access jQM's added prototypes
-        mdot.mobilize(iphoneWin.jQuery("div[data-role='page']"), chromeDoc.body);
+        mdot.mobilize(mobileWin.jQuery("div[data-role='page']"), desktopDoc.body);
   
         // this is a way to remove bad images:
         // http://stackoverflow.com/questions/4317312/want-to-hide-image-when-image-is-not-found-at-the-src-location
-        iphoneWin.jQuery('img').error(function(){
+        mobileWin.jQuery('img').error(function(){
           this.style.display = 'none';
         });
   
-        iphoneWin.jQuery('img').each(function() { this.src = this.src; });
+        mobileWin.jQuery('img').each(function() { this.src = this.src; });
   
-        $('#iphone .loading').remove();
-        $(iphoneFrame).removeClass('hidden');
+        $('.mobile .loading').remove();
+        $(mobileFrame).removeClass('hidden');
+
+        $('.roundabout-holder').bind('animationStart', function() {
+          $(mobileFrame).addClass('hidden');
+          $(desktopFrame).addClass('hidden');
+        });
+        $('.roundabout-holder').bind('animationEnd', function() {
+          $(mobileFrame).removeClass('hidden');
+          $(desktopFrame).removeClass('hidden');
+        });
+
+        $('.roundabout-moveable-item.mobile').bind('blur', function() {
+          $(this.firstElementChild).css({
+            '-webkit-transform-origin':'0% 0%',
+            '-webkit-transform':'scale(0.85)',
+            top:'95.2px',
+            left:'28.05px'
+          });
+        });
+        $('.roundabout-moveable-item.mobile').bind('focus', function() {
+          $(this.firstElementChild).css({
+            '-webkit-transform-origin':'0% 0%',
+            '-webkit-transform':'none',
+            top:'112px',
+            left:'33px'
+          });
+        });
+
+        $('.roundabout-moveable-item.desktop').bind('blur', function() {
+          $(this.firstElementChild).css({
+            '-webkit-transform-origin':'0% 0%',
+            '-webkit-transform':'scale(0.85)',
+            top:'95.2px',
+            left:'28.05px'
+          });
+        });
+        $('.roundabout-moveable-item.desktop').bind('focus', function() {
+          $(this.firstElementChild).css({
+            '-webkit-transform-origin':'0% 0%',
+            '-webkit-transform':'none',
+            top:'112px',
+            left:'33px'
+          });
+        });
+
   
         $('#action').removeAttr('disabled');
   
-        // zoom the contents of the chrome page to fit the iphone width
-        $(chromeDoc.body).css({
-          'zoom': 256 / chromeDoc.width,
+        // zoom the contents of the desktop page to fit the iphone width
+        $(desktopDoc.body).css({
+          'zoom': 256 / desktopDoc.width,
           'overflow-y':'hidden'
         });
   
-        chromeDoc.addEventListener('mousewheel',function(e) {
+        desktopDoc.addEventListener('mousewheel',function(e) {
           e.preventDefault();//to stop the entire page being scrolled
-          var scrollTop = $(chromeDoc).scrollTop();
-          $(chromeDoc).scrollTop(scrollTop-e.wheelDeltaY);
+          var scrollTop = $(desktopDoc).scrollTop();
+          $(desktopDoc).scrollTop(scrollTop-e.wheelDeltaY);
         }, false);
       });
   
-      chromeDoc.write(markup);
-      chromeDoc.close();
+      desktopDoc.write(markup);
+      desktopDoc.close();
   
     }}
   
   
   // this is supposed to be the place where initialization stuff happens 
   my.init = function() {
+
+    $('.phones').roundabout({
+      childSelector:'div',
+      clickToFocus:false,
+      minScale:0.8,
+      minOpacity:0.9
+    });
+
+    var isAtBefore = false;
+
+    $('.before').click(function() {
+      if(!isAtBefore) $('.phones').roundabout('animateToNextChild');
+      isAtBefore = true;
+    });
   
+    $('.after').click(function() {
+      if(isAtBefore) $('.phones').roundabout('animateToPreviousChild');
+      isAtBefore = false;
+    });
+
     $('#action').click(function() {
       $(this).attr('disabled', 'disabled');
   
@@ -177,17 +242,10 @@ var mdot = (function(my, $) {
   
     });
   
-    $('#before').click(function() {
-      $('#chrome').removeClass('hidden');
-    });
-    $('#after').click(function() {
-      $('#chrome').addClass('hidden');
-    });
-
-    $('#savePageForm').submit(function() {
-      var foo = iphoneDoc.documentElement.outerHTML;
-      $('#iphoneHtml').val(foo);
-    });
+    //$('#savePageForm').submit(function() {
+      //var foo = mobileDoc.documentElement.outerHTML;
+      //$('#mobileHtml').val(foo);
+    //});
   
   }
 

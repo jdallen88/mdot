@@ -13,5 +13,6 @@
 //= require jquery
 //= require jquery_ujs
 //= require jquery.url
+//= require jquery.roundabout
 //= require bootstrap
 //= require_directory .
